@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,18 +12,18 @@ using System.Threading;
 using MongoDB.Driver;
 using MongoDB.Bson;
 
-// to do: threading and premere q per uscire
+// to do: threading and press q to exit
 
 namespace SharpScraper
 {
     class Program
     {
-        // Per comodità, stampa una lsita di stringhe
-        static void stampaLista(List<string> lista)
+        // For convenience, print a string of strings
+        static void PrintList(List<string> list)
         {
-            for (int i = 0; i < lista.Count(); i++)
+            for (int i = 0; i < list.Count(); i++)
             {
-                Console.WriteLine(lista[i]);
+                Console.WriteLine(list[i]);
             }
         }
 
@@ -32,7 +32,8 @@ namespace SharpScraper
             string banner =
 @" ############################################################################ 
  #             SharpScraper - A pastebin scraper written in C#              # 
- #                        Mady by TrinTragula in 2017.                      # 
+ #                        Made by TrinTragula in 2017.                      # 
+ #                   Translated by ModernAesthetics in 2019.                # 
  #                           Open source and free.                          # 
  ############################################################################ 
 
@@ -40,7 +41,7 @@ namespace SharpScraper
 
             var mongoDB = new Database();
             var sharpScraper = new Scraper();
-            // Scegliere qua il regex da usare
+            // Choose the regex to use here
             string regex = @"\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*";
             Console.SetWindowSize( Math.Min(78, Console.LargestWindowWidth), Math.Min(30, Console.LargestWindowHeight));
             Console.BackgroundColor = ConsoleColor.DarkRed;
