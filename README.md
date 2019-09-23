@@ -16,4 +16,4 @@ Don't reduce the timeout between calls. If you do it, you'll probably have your 
 Daniele aka TrinTragula. It's completly free to use, share and modify.
 
 ## Who translated it?
-Me, ModernAesthetics.
+Me, ModernAesthetics. Original was in Italian.
