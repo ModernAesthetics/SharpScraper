@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,30 +14,30 @@ using MongoDB.Bson;
 
 namespace SharpScraper
 {
-    /* Interfaccia per il mio scraper
-     * Avrà le seguenti 3 funzioni: */
+    /* Interface for my scraper
+     * It will have the following 3 functions: */
     interface IScraper
     {
-        List<string> getRecentPaste(); // Ottieni gli ultimi paste più recenti da http://pastebin.com/archive
-        string getPasteText(string url); // Ottieni il testo del paste all'url indicato (/stringa), da appendere a http://pastebin.com/raw
-        bool isKeywordPresent(string text, string regex); // Controlla se il paste contiene una delle keyword che stiamo cercando
+        List<string> getRecentPaste(); // Get the latest latest pastes from http://pastebin.com/archive
+        string getPasteText(string url); // Get the text of the paste at the indicated url (/ string), http://pastebin.com/raw
+        bool isKeywordPresent(string text, string regex); // Check if the paste contains one of the keywords we are looking for
     }
 
-    // Definizone classe per pastebin
+    // Class definition for pastebin
     class Scraper : IScraper
     {
-        // url hardcoded di pastebin, da cambiare nel caso cambi interfaccia web
+        // url hard-coded by pastebin, to be changed in the case of web interface changes
         public string pasteBinUrl = "http://pastebin.com/archive";
         public string pasteBinArchiveUrl = "http://pastebin.com/archive";
         public string pasteBinRawUrl = "http://pastebin.com/raw";
-        public int timeOut = 10000; // tempo da attendere fra successive richieste in ms (per non essere bloccati e rispettare i TOS)
+        public int timeOut = 10000; // time to wait between successive requests in ms (so as not to be blocked and respect the TOS)
         private int idScraper;
         public static int numberOfScrapers = 0;
         ScrapingBrowser scraperBrowser;
 
         public Scraper()
         {
-            // Creo un browser per scaricare la pagian delgi ultimi paste
+            // I create a browser to download the page of pastes
             this.scraperBrowser = new ScrapingBrowser();
             this.scraperBrowser.AllowAutoRedirect = true;
             this.scraperBrowser.AllowMetaRedirect = true;
@@ -45,34 +45,34 @@ namespace SharpScraper
             numberOfScrapers++;
         }
 
-        // Ottieni gli ultimi paste più recenti da http://pastebin.com/archive
+        // Get the latest latest pastes from http://pastebin.com/archive
         public List<string> getRecentPaste()
         {
             List<string> pastebins = new List<string>();
-            // Effettuo la richiesta
+            // I make the request
             WebPage responsePage = scraperBrowser.NavigateToPage(new Uri("http://pastebin.com/archive"));
-            // Uso HtmlAgilityPack per selezionare l'elemento della pagina HTML con classe maintable
-            // ovvero la tabella in cui sono contenuti i link ai paste recenti
+            // Use HtmlAgilityPack to select the HTML page element with maintable class
+            // or the table containing the links to recent pastes
             var pastebinsTable = responsePage.Html.CssSelect(".maintable").First();
-            // Seleziono i membri della tabella
+            // I select the table members
             var row = pastebinsTable.SelectNodes("tr/td");
-            // Ogni paste è composto da tre elementi
-            // Il primo elemento è il link in formato <a href="/pagina">
-            // Il secondo è quanto tempo fa è stato creato il paste
-            // Il terzo indica il linguaggio di programmazione, se presente, usato nel paste
-            // Ciclo dunque con icnrementni di 3
+            // Each paste is composed of three elements
+            // The first element is the link in <a href="/page"> format
+            // The second is how long ago the paste was created
+            // The third indicates the programming language, if present, used in the paste
+            // Cycle with an increment of 3
             for (int i = 0; i < row.Count; i += 3)
             {
-                // Ottengo il link da dentro le virgolette
+                // I get the link from inside the quotes
                 string s = row[i].LastChild.OuterHtml;
                 int start = s.IndexOf('"') + 1;
                 int end = s.IndexOf('"', start);
                 string actualLink = s.Substring(start, end - start);
-                // Ottengo il tempo ( potrebbe essermi utile in futuro )
+                // I get the time (could be useful in the future)
                 string timeAgo = row[i + 1].LastChild.OuterHtml;
-                // Ottengo il linguaggio usato
+                // I get the language used
                 string languageUsed = row[i + 2].LastChild.OuterHtml;
-                // Aggiungo il link alla lista
+                // I add the link to the list
                 pastebins.Add(actualLink);
             }
             return pastebins;
@@ -80,7 +80,7 @@ namespace SharpScraper
 
         public string getPasteText(string url)
         {
-            // Scarico il paste da pastebin.com/raw/url, in puro testo
+            // Download the paste from pastebin.com/raw/url, in pure text
             string actualUrl = pasteBinRawUrl + url;
             try
             {
@@ -96,7 +96,7 @@ namespace SharpScraper
 
         }
 
-        // Funzione per confrontare una stringa con un'espressione regolare
+        // Function to compare a string with a regular expression
         public bool isKeywordPresent(string text, string regex)
         {
             Regex r = new Regex(regex);
@@ -104,32 +104,32 @@ namespace SharpScraper
             return isKeywordHere;
         }
 
-        // ROutine per cominciare il monitoraggio
+        // Routine to begin monitoring
         public void startScraping(string regex, Database mongoDB)
         {
             decimal i = 0;
             string paste;
             Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine("Cerco secondo la regex {0}...", regex);
+            Console.WriteLine("Scraping according to the regex {0}...", regex);
             Console.ResetColor();
-            // loop senza fine, finché l'utent non preme ctrl+c
+            // endless loop, until the user presses ctrl + c
             for (;;)
             {
                 Console.WriteLine("");
                 Console.BackgroundColor = ConsoleColor.DarkBlue;
                 Console.ForegroundColor = ConsoleColor.White;
-                Console.WriteLine("Richiesta numero {0}... (timeout di 30s per evitare un ban, ctrl+c per uscire)", i + 1);
+                Console.WriteLine("Request number {0}... (30s timeout to avoid a ban, ctrl + c to exit)", i + 1);
                 Console.ResetColor();
-                // Tra ogni batch di richieste, aspetta un po' di più
+                // Between each batch of requests, wait a little longer
                 Thread.Sleep(30000);
                 List<string> pasteList = getRecentPaste();
-                Console.WriteLine("{0} paste ottenuti!", pasteList.Count());          
+                Console.WriteLine("{0} pastes obtained!", pasteList.Count());          
                 for (int j = 0; j < pasteList.Count(); j++)
                 {
-                    Thread.Sleep(timeOut); //per non generare troppo traffico, aspetta tra una richiesta e l'altra
+                    Thread.Sleep(timeOut); // in order not to generate too much traffic, wait between one request and another
                     paste = getPasteText(pasteList[j]);
                     Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.Write("\rCerco paste {0} di {1}   ", j+1, pasteList.Count());
+                    Console.Write("\rI'm looking for pastes {0} of {1}   ", j+1, pasteList.Count());
                     Console.ResetColor();
                     if (isKeywordPresent(paste, regex))
                     {
@@ -137,14 +137,14 @@ namespace SharpScraper
                         string actualUrl = pasteBinRawUrl + pasteList[j];
                         Console.BackgroundColor = ConsoleColor.Green;
                         Console.ForegroundColor = ConsoleColor.Black;
-                        Console.WriteLine("### Trovata una corrispondenza! Url: {0} ###", actualUrl);
+                        Console.WriteLine("### A correspondence found! Url: {0} ###", actualUrl);
                         Console.ResetColor();
-                        // Inserisci nel database il paste che hai scoeprto e corrisponde ai nsotir criteri di ricerca
+                        // Enter in the database the paste you have sent and corresponds to our search criteria
                         mongoDB.insertPaste(paste, actualUrl);
                         Console.WriteLine("");
                     }
                 }
-                // Incremento per ricordare quante richieste ho fatto
+                // Increase to remember how many requests I made
                 i++;
             }
 
