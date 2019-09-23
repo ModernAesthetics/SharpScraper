@@ -13,4 +13,7 @@ Don't reduce the timeout between calls. If you do it, you'll probably have your 
 [Here is a statement from Pastebin about scraping their website](http://pastebin.com/scraping)
 
 ## Who made it?
-I made it, Daniele aka TrinTragula. It's completly free to use, share and modify. Just a random project I made to help myself learn C# and MongoDB.
+Daniele aka TrinTragula. It's completly free to use, share and modify.
+
+## Who translated it?
+Me, ModernAesthetics.
