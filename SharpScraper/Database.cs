@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,14 +14,14 @@ using MongoDB.Bson;
 
 namespace SharpScraper
 {
-    // Per inserire i risultati in un database noSQL
+    // To insert the results in a noSQL database
     public class Database
     {
         MongoClient client;
         IMongoDatabase database;
         IMongoCollection<BsonDocument> collection;
 
-        // Inizializzo il database
+        // Initialize the database
         public Database()
         {
             this.client = new MongoClient("mongodb://localhost:27017");
@@ -29,7 +29,7 @@ namespace SharpScraper
             this.collection = database.GetCollection<BsonDocument>("findings_");
         }
 
-        // Per inserire un paste trovato
+        // To insert a paste found
         public void insertPaste(string text, string url)
         {
             var document = new BsonDocument
