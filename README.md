@@ -5,7 +5,7 @@ A pastebin scraper written in C#, using MongoDB as a db.
 
 
 ## What you need
-You need to have a MongoDB database up and running in order to get it to work. The code should be commented well enough (actually, it's in italian, I'll probably translate it one day)
+You need to have a MongoDB database up and running in order to get it to work. The code should be commented well enough.
 
 ## Why is it so slow?
 The program waits a lot between requests in order not to get banned by pastebin's very strict policy against scraping.
